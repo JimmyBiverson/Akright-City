@@ -15,11 +15,12 @@
 <body class="min-h-screen {{ request()->routeIs('home') ? 'home' : 'inner-page' }}">
     @php
         $navVillages = App\Models\Village::orderBy('sort_order')->get();
+        $villageChunks = $navVillages->chunk(max(1, (int) ceil($navVillages->count() / 2)));
     @endphp
 
     <a class="skip-link" href="#main-content">Skip to content</a>
 
-    <header class="site-header {{ request()->routeIs('home') ? '' : 'is-solid' }}" id="safari-header" data-site-header>
+    <header class="site-header" id="safari-header" data-site-header>
         <div class="header-top-bar">
             <div class="container-site top-bar-content">
                 <div class="top-bar-left">
@@ -52,7 +53,7 @@
                             Team
                             <svg class="nav-chevron" viewBox="0 0 12 8" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path stroke-linecap="round" d="m1 1 5 5 5-5"/></svg>
                         </a>
-                        <div class="mega-menu simple-menu" id="menu-team">
+                        <div class="mega-menu narrow" id="menu-team">
                             <div class="mega-menu-content">
                                 <div class="mega-menu-section">
                                     <h4><a href="{{ route('team') }}">Association Leadership</a></h4>
@@ -77,18 +78,15 @@
                             Villages
                             <svg class="nav-chevron" viewBox="0 0 12 8" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path stroke-linecap="round" d="m1 1 5 5 5-5"/></svg>
                         </a>
-                        <div class="mega-menu" id="menu-villages">
+                        <div class="mega-menu narrow" id="menu-villages">
                             <div class="mega-menu-content">
-                                <div class="mega-menu-section">
-                                    <h4><a href="{{ route('villages.index') }}">Our Twelve Villages</a></h4>
-                                    <ul>
-                                        <li><a href="{{ route('villages.index') }}" class="mega-all"><i aria-hidden="true"></i> All Villages</a></li>
-                                    </ul>
-                                </div>
-                                @foreach ($navVillages->chunk(4) as $chunk)
+                                @foreach ($villageChunks as $chunkIndex => $chunk)
                                     <div class="mega-menu-section">
-                                        <h4>Community</h4>
+                                        <h4>{{ $chunkIndex === 0 ? 'Our Villages' : 'More Villages' }}</h4>
                                         <ul>
+                                            @if ($chunkIndex === 0)
+                                                <li><a href="{{ route('villages.index') }}" class="mega-all"><i aria-hidden="true"></i> All Villages</a></li>
+                                            @endif
                                             @foreach ($chunk as $village)
                                                 <li><a href="{{ route('villages.show', $village->slug) }}"><i aria-hidden="true"></i> {{ str_replace(' Village', '', $village->name) }}</a></li>
                                             @endforeach
@@ -102,7 +100,7 @@
 
                 <a href="{{ route('home') }}" class="nav-logo" aria-label="Akright City home">
                     <span class="brand-logo brand-logo--nav">
-                        <img src="{{ App\Support\LegacyAsset::url('images/logo.png') }}" alt="ACRA Logo">
+                        <img src="{{ asset('acra-logo-header.png') }}" alt="ACRA Logo">
                     </span>
                 </a>
 
@@ -110,7 +108,7 @@
                     <li><a href="{{ route('reports') }}" class="nav-link {{ request()->routeIs('reports') ? 'is-current' : '' }}" @if(request()->routeIs('reports')) aria-current="page" @endif>Reports</a></li>
                     <li><a href="{{ route('news.index') }}" class="nav-link {{ request()->routeIs('news.*') ? 'is-current' : '' }}" @if(request()->routeIs('news.*')) aria-current="page" @endif>News</a></li>
                     <li class="has-dropdown" data-dropdown data-open="false">
-                        <a href="{{ route('faqs') }}" class="nav-link {{ request()->routeIs('faqs', 'gallery', 'youtube', 'contact', 'directory') ? 'is-current' : '' }}" data-dropdown-trigger aria-expanded="false" aria-controls="menu-help">
+                        <a href="{{ route('faqs') }}" class="nav-link {{ request()->routeIs('faqs', 'gallery', 'youtube', 'contact', 'directory') ? 'is-current' : '' }}" data-dropdown-trigger aria-expanded="false" aria-controls="menu-help" @if(request()->routeIs('faqs', 'gallery', 'youtube', 'contact', 'directory')) aria-current="page" @endif>
                             Help &amp; Info
                             <svg class="nav-chevron" viewBox="0 0 12 8" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path stroke-linecap="round" d="m1 1 5 5 5-5"/></svg>
                         </a>
@@ -148,7 +146,7 @@
         <div class="mobile-nav-header">
             <a href="{{ route('home') }}" class="mobile-nav-logo" aria-label="Akright City home">
                 <span class="brand-logo brand-logo--mobile">
-                    <img src="{{ App\Support\LegacyAsset::url('images/logo.png') }}" alt="ACRA Logo">
+                    <img src="{{ asset('acra-logo-header.png') }}" alt="ACRA Logo">
                 </span>
             </a>
             <button type="button" class="mobile-close-btn" id="mobile-close-btn" data-mobile-close aria-label="Close Menu">

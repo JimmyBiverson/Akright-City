@@ -40,10 +40,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const refreshScrollTriggers = () => ScrollTrigger.refresh();
     const header = document.querySelector('[data-site-header]');
     const mainNav = document.querySelector('[data-main-nav]');
-    const isHome = document.body.classList.contains('home');
 
     const updateHeader = () => {
-        const scrolled = !isHome && window.scrollY > 40;
+        const scrolled = window.scrollY > 40;
         header?.classList.toggle('is-scrolled', scrolled);
         mainNav?.classList.toggle('is-scrolled', scrolled);
     };
@@ -58,6 +57,32 @@ document.addEventListener('DOMContentLoaded', () => {
     const focusableSelector = 'a[href], button:not([disabled]), [tabindex]:not([tabindex="-1"])';
     let lastFocusedElement = null;
     let lockedScrollY = 0;
+
+    const closeMobileSubmenu = (toggle, submenu) => {
+        submenu.classList.remove('open');
+        submenu.style.maxHeight = '0px';
+        toggle.setAttribute('aria-expanded', 'false');
+    };
+
+    const openMobileSubmenu = (toggle, submenu) => {
+        submenu.classList.add('open');
+        submenu.style.maxHeight = `${submenu.scrollHeight}px`;
+        toggle.setAttribute('aria-expanded', 'true');
+    };
+
+    const syncOpenSubmenuHeights = () => {
+        if (!mobileNav) {
+            return;
+        }
+
+        mobileNav.querySelectorAll('[data-mobile-submenu-toggle]').forEach((toggle) => {
+            const submenu = document.getElementById(toggle.getAttribute('aria-controls') ?? '');
+
+            if (submenu?.classList.contains('open')) {
+                submenu.style.maxHeight = `${submenu.scrollHeight}px`;
+            }
+        });
+    };
 
     const closeMobileNav = () => {
         if (!mobileNav || !mobileOverlay || !mobileNav.classList.contains('is-open')) {
@@ -91,6 +116,7 @@ document.addEventListener('DOMContentLoaded', () => {
         mobileOverlay.classList.add('is-open');
         mobileNav.setAttribute('aria-hidden', 'false');
         mobileOpen?.setAttribute('aria-expanded', 'true');
+        syncOpenSubmenuHeights();
         mobileClose?.focus();
     };
 
@@ -109,9 +135,25 @@ document.addEventListener('DOMContentLoaded', () => {
                 return;
             }
 
-            const open = submenu.classList.toggle('open');
-            toggle.setAttribute('aria-expanded', String(open));
-            refreshScrollTriggers();
+            const shouldOpen = !submenu.classList.contains('open');
+
+            mobileNav.querySelectorAll('[data-mobile-submenu-toggle]').forEach((otherToggle) => {
+                if (otherToggle === toggle) {
+                    return;
+                }
+
+                const otherSubmenu = document.getElementById(otherToggle.getAttribute('aria-controls') ?? '');
+
+                if (otherSubmenu?.classList.contains('open')) {
+                    closeMobileSubmenu(otherToggle, otherSubmenu);
+                }
+            });
+
+            if (shouldOpen) {
+                openMobileSubmenu(toggle, submenu);
+            } else {
+                closeMobileSubmenu(toggle, submenu);
+            }
         });
     });
 
@@ -150,6 +192,8 @@ document.addEventListener('DOMContentLoaded', () => {
         if (window.innerWidth > 991 && mobileNav?.classList.contains('is-open')) {
             closeMobileNav();
         }
+
+        syncOpenSubmenuHeights();
     });
 
     const dropdowns = Array.from(document.querySelectorAll('.has-dropdown'));
@@ -574,13 +618,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    const headerOffset = () => {
-        if (isHome) {
-            return 16;
-        }
-
-        return (header?.offsetHeight ?? 0) + 8;
-    };
+    const headerOffset = () => (header?.offsetHeight ?? 0) + 8;
 
     document.querySelectorAll('a[href*="#"]').forEach((link) => {
         link.addEventListener('click', (event) => {

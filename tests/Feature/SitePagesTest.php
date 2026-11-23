@@ -67,13 +67,26 @@ class SitePagesTest extends TestCase
     public function test_home_page_renders_responsive_navigation_structure(): void
     {
         $this->seedBaseContent();
+        Village::factory()->create([
+            'slug' => 'suncity',
+            'name' => 'Suncity Village',
+        ]);
+
+        $this->assertFileExists(public_path('acra-logo-header.png'));
+        $this->assertSame('image/png', getimagesize(public_path('acra-logo-header.png'))['mime']);
 
         $this->get(route('home'))
             ->assertOk()
-            ->assertSee('id="safari-header"', false)
+            ->assertSee('class="site-header"', false)
+            ->assertDontSee('is-solid', false)
             ->assertSee('id="mobile-navigation"', false)
             ->assertSee('data-mobile-submenu-toggle', false)
-            ->assertSee('id="menu-villages"', false)
+            ->assertSee('class="mega-menu narrow" id="menu-team"', false)
+            ->assertSee('class="mega-menu narrow" id="menu-villages"', false)
+            ->assertSee('class="mega-menu narrow" id="menu-help"', false)
+            ->assertDontSee('class="mega-menu" id="menu-villages"', false)
+            ->assertSee('Suncity', false)
+            ->assertSee('acra-logo-header.png', false)
             ->assertSee('Payments');
     }
 
