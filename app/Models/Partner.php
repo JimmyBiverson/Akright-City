@@ -1,0 +1,22 @@
+<?php
+
+namespace App\Models;
+
+use Database\Factories\PartnerFactory;
+use Illuminate\Database\Eloquent\Attributes\Fillable;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+
+#[Fillable(['name', 'logo', 'sort_order'])]
+class Partner extends Model
+{
+    /** @use HasFactory<PartnerFactory> */
+    use HasFactory;
+
+    protected function casts(): array
+    {
+        return [
+            'sort_order' => 'integer',
+        ];
+    }
+}
