@@ -113,6 +113,38 @@ class SitePagesTest extends TestCase
             ->assertSee('name="twitter:image"', false);
     }
 
+    public function test_home_page_renders_light_intro_zoom_before_villages(): void
+    {
+        $this->seedBaseContent();
+
+        Village::factory()->create([
+            'slug' => 'green-terrace',
+            'name' => 'Green Terrace Village',
+        ]);
+
+        $response = $this->get(route('home'));
+        $html = $response->getContent();
+
+        $response->assertOk()
+            ->assertSee('class="cta-zoom cta-zoom--intro"', false)
+            ->assertSee('data-cta-zoom-end="+=110%"', false)
+            ->assertSee('About ACRA', false)
+            ->assertSee('One community, one place to stay connected.', false)
+            ->assertSee('Akright City Residents Association brings residents', false)
+            ->assertSee('Explore Villages', false)
+            ->assertSee('Community news', false)
+            ->assertSee('data-intro-text', false);
+
+        $this->assertSame(7, substr_count($html, 'data-intro-text'));
+
+        $introPosition = strpos($html, 'One community, one place to stay connected.');
+        $villagesPosition = strpos($html, 'id="villages"');
+
+        $this->assertNotFalse($introPosition);
+        $this->assertNotFalse($villagesPosition);
+        $this->assertLessThan($villagesPosition, $introPosition);
+    }
+
     public function test_hero_images_use_optimized_local_variants(): void
     {
         $this->seedBaseContent();

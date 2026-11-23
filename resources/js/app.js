@@ -449,24 +449,51 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    if (!reducedMotion && document.querySelector('[data-cta-zoom]') && window.matchMedia('(min-width: 1024px)').matches) {
-        const zoom = document.querySelector('[data-cta-zoom]');
-        const media = zoom.querySelector('[data-cta-zoom-media]');
-        const ring = zoom.querySelector('[data-cta-zoom-ring]');
-        const copy = zoom.querySelector('[data-cta-zoom-text]');
+    const zoomSections = Array.from(document.querySelectorAll('[data-cta-zoom]'));
 
-        gsap.timeline({
-            scrollTrigger: {
-                trigger: zoom,
-                start: 'top top',
-                end: '+=140%',
-                scrub: 1,
-                pin: true,
-            },
-        })
-            .fromTo(media, { clipPath: 'circle(74px at 50% 50%)', scale: 1.14 }, { clipPath: 'circle(120% at 50% 50%)', scale: 1, duration: 2, ease: 'power2.in' }, 0)
-            .fromTo(ring, { scale: 1, autoAlpha: 0.9 }, { scale: 340, autoAlpha: 0, duration: 2, ease: 'power2.in' }, 0)
-            .fromTo(copy, { autoAlpha: 0.25, scale: 0.98 }, { autoAlpha: 1, scale: 1, duration: 1.1, ease: 'power2.out' }, '-=1');
+    if (!reducedMotion && zoomSections.length > 0 && window.matchMedia('(min-width: 1024px)').matches) {
+        zoomSections.forEach((zoom) => {
+            const media = zoom.querySelector('[data-cta-zoom-media]');
+            const ring = zoom.querySelector('[data-cta-zoom-ring]');
+            const copy = zoom.querySelector('[data-cta-zoom-text]');
+
+            if (!media || !ring || !copy) {
+                return;
+            }
+
+            const isIntro = zoom.classList.contains('cta-zoom--intro');
+            const introTextTargets = isIntro ? Array.from(copy.querySelectorAll('[data-intro-text]')) : [];
+            const finalTextColors = introTextTargets.map((element) => window.getComputedStyle(element).color);
+            const startColor = window.getComputedStyle(zoom).getPropertyValue('--intro-start-color').trim() || '#E6A352';
+
+            const timeline = gsap.timeline({
+                scrollTrigger: {
+                    trigger: zoom,
+                    start: 'top top',
+                    end: zoom.dataset.ctaZoomEnd || '+=140%',
+                    scrub: 1,
+                    pin: true,
+                    anticipatePin: 1,
+                },
+            });
+
+            timeline
+                .fromTo(media, { clipPath: 'circle(74px at 50% 50%)', scale: 1.14 }, { clipPath: 'circle(120% at 50% 50%)', scale: 1, duration: 2, ease: 'power2.in' }, 0)
+                .fromTo(ring, { scale: 1, autoAlpha: 0.9 }, { scale: 340, autoAlpha: 0, duration: 2, ease: 'power2.in' }, 0)
+                .fromTo(copy, { autoAlpha: isIntro ? 0.85 : 0.25, scale: isIntro ? 0.995 : 0.98 }, { autoAlpha: 1, scale: 1, duration: 1.1, ease: 'power2.out' }, '-=1');
+
+            if (introTextTargets.length > 0) {
+                timeline.fromTo(introTextTargets,
+                    { color: startColor },
+                    {
+                        color: (index) => finalTextColors[index],
+                        duration: 1.1,
+                        ease: 'power2.out',
+                        clearProps: 'color',
+                    },
+                    '<');
+            }
+        });
     }
 
     document.querySelectorAll('[data-particles]').forEach((canvas) => {

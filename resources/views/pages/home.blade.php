@@ -111,6 +111,32 @@
     </div>
 </section>
 
+@php
+    $introZoomImage = $sliderVillages->first()?->card_image ?: $galleryImage;
+@endphp
+
+<section class="cta-zoom cta-zoom--intro" data-cta-zoom data-cta-zoom-end="+=110%">
+    <div class="cta-zoom-media" data-cta-zoom-media style="background-image: url('{{ $introZoomImage }}');"></div>
+    <div class="cta-zoom-ring" data-cta-zoom-ring aria-hidden="true"></div>
+    <div class="container-site cta-zoom-text" data-cta-zoom-text>
+        <div class="intro-zoom-copy">
+            <p class="section-label" data-intro-text>About ACRA</p>
+            <h2 data-intro-text>One community, one place to stay connected.</h2>
+            <p class="intro-zoom-lead" data-intro-text>Akright City Residents Association brings residents, village leaders, local businesses, and partners into one shared space — for trusted news, useful documents, community stories, and easier collaboration across our neighbourhood.</p>
+            <div class="intro-zoom-actions">
+                <a href="{{ route('about') }}" class="btn btn-primary">Discover ACRA</a>
+                <a href="{{ route('villages.index') }}" class="btn btn-secondary">Explore Villages</a>
+            </div>
+            <ul class="intro-zoom-chips" aria-label="What you can find on this site">
+                <li data-intro-text>Community news</li>
+                <li data-intro-text>Reports &amp; documents</li>
+                <li data-intro-text>Village directory</li>
+                <li data-intro-text>FAQs &amp; contacts</li>
+            </ul>
+        </div>
+    </div>
+</section>
+
 <section class="villages" id="villages">
     <div class="container-site section-center" data-reveal>
         <p class="section-label">Our Community</p>
