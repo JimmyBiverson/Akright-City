@@ -12,151 +12,198 @@
     <meta property="og:url" content="{{ url()->current() }}">
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
-<body class="min-h-screen">
-    <header class="site-header {{ request()->routeIs('home') ? '' : 'is-solid' }}" data-site-header>
-        <div class="utility-bar">
-            <div class="container-site utility-inner">
-                <span>Akright City, Entebbe Road</span>
-                <a href="mailto:info@akrightcity.com">info@akrightcity.com</a>
-                <a href="{{ route('payments') }}">Pay ACRA Subscription</a>
+<body class="min-h-screen {{ request()->routeIs('home') ? 'home' : 'inner-page' }}">
+    @php
+        $navVillages = App\Models\Village::orderBy('sort_order')->get();
+    @endphp
+
+    <a class="skip-link" href="#main-content">Skip to content</a>
+
+    <header class="site-header {{ request()->routeIs('home') ? '' : 'is-solid' }}" id="safari-header" data-site-header>
+        <div class="header-top-bar">
+            <div class="container-site top-bar-content">
+                <div class="top-bar-left">
+                    <span class="top-contact">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M12 21s7-5.4 7-11a7 7 0 1 0-14 0c0 5.6 7 11 7 11Z"/><circle cx="12" cy="10" r="2.5"/></svg>
+                        <span>Akright City, Entebbe Road</span>
+                    </span>
+                    <a href="mailto:info@akrightcity.com" class="top-contact">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><path stroke-linecap="round" d="m4 7 8 6 8-6"/></svg>
+                        <span>info@akrightcity.com</span>
+                    </a>
+                </div>
+                <div class="top-bar-right">
+                    <a href="{{ route('payments') }}">Pay ACRA Subscription</a>
+                </div>
             </div>
         </div>
 
-        <div class="nav-bar">
-            <div class="container-site nav-inner">
-                <button type="button" data-mobile-open class="menu-button" aria-label="Open navigation" aria-expanded="false" aria-controls="mobile-navigation">
-                    <svg class="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
-                        <path stroke-linecap="round" d="M4 7h16M4 12h16M4 17h16"/>
-                    </svg>
+        <nav class="main-nav" id="main-nav" data-main-nav aria-label="Primary">
+            <div class="container-site nav-wrapper">
+                <button type="button" class="mobile-menu-btn" id="mobile-menu-btn" data-mobile-open aria-label="Toggle Menu" aria-controls="mobile-navigation" aria-expanded="false">
+                    <span></span><span></span><span></span>
                 </button>
 
-                <a href="{{ route('home') }}" class="brand-lockup" aria-label="Akright City home">
-                    <span class="brand-plate">
+                <ul class="nav-links nav-left" id="menu-header-left">
+                    <li><a href="{{ route('home') }}" class="nav-link {{ request()->routeIs('home') ? 'is-current' : '' }}" @if(request()->routeIs('home')) aria-current="page" @endif>Home</a></li>
+                    <li><a href="{{ route('about') }}" class="nav-link {{ request()->routeIs('about') ? 'is-current' : '' }}" @if(request()->routeIs('about')) aria-current="page" @endif>About Us</a></li>
+                    <li class="has-dropdown" data-dropdown data-open="false">
+                        <a href="{{ route('team') }}" class="nav-link {{ request()->routeIs('team') ? 'is-current' : '' }}" data-dropdown-trigger aria-expanded="false" aria-controls="menu-team" @if(request()->routeIs('team')) aria-current="page" @endif>
+                            Team
+                            <svg class="nav-chevron" viewBox="0 0 12 8" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path stroke-linecap="round" d="m1 1 5 5 5-5"/></svg>
+                        </a>
+                        <div class="mega-menu simple-menu" id="menu-team">
+                            <div class="mega-menu-content">
+                                <div class="mega-menu-section">
+                                    <h4><a href="{{ route('team') }}">Association Leadership</a></h4>
+                                    <ul>
+                                        <li><a href="{{ route('team') }}#executive"><i aria-hidden="true"></i> Executive Committee</a></li>
+                                        <li><a href="{{ route('team') }}#council"><i aria-hidden="true"></i> Council Members</a></li>
+                                        <li><a href="{{ route('team') }}#conciliatory"><i aria-hidden="true"></i> Conciliatory Committee</a></li>
+                                    </ul>
+                                </div>
+                                <div class="mega-menu-section">
+                                    <h4>Get Involved</h4>
+                                    <ul>
+                                        <li><a href="{{ route('contact') }}"><i aria-hidden="true"></i> Contact the Association</a></li>
+                                        <li><a href="{{ route('payments') }}" class="mega-all"><i aria-hidden="true"></i> Pay ACRA Subscription</a></li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </li>
+                    <li class="has-dropdown" data-dropdown data-open="false">
+                        <a href="{{ route('villages.index') }}" class="nav-link {{ request()->routeIs('villages.*') ? 'is-current' : '' }}" data-dropdown-trigger aria-expanded="false" aria-controls="menu-villages" @if(request()->routeIs('villages.*')) aria-current="page" @endif>
+                            Villages
+                            <svg class="nav-chevron" viewBox="0 0 12 8" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path stroke-linecap="round" d="m1 1 5 5 5-5"/></svg>
+                        </a>
+                        <div class="mega-menu" id="menu-villages">
+                            <div class="mega-menu-content">
+                                <div class="mega-menu-section">
+                                    <h4><a href="{{ route('villages.index') }}">Our Twelve Villages</a></h4>
+                                    <ul>
+                                        <li><a href="{{ route('villages.index') }}" class="mega-all"><i aria-hidden="true"></i> All Villages</a></li>
+                                    </ul>
+                                </div>
+                                @foreach ($navVillages->chunk(4) as $chunk)
+                                    <div class="mega-menu-section">
+                                        <h4>Community</h4>
+                                        <ul>
+                                            @foreach ($chunk as $village)
+                                                <li><a href="{{ route('villages.show', $village->slug) }}"><i aria-hidden="true"></i> {{ str_replace(' Village', '', $village->name) }}</a></li>
+                                            @endforeach
+                                        </ul>
+                                    </div>
+                                @endforeach
+                            </div>
+                        </div>
+                    </li>
+                </ul>
+
+                <a href="{{ route('home') }}" class="nav-logo" aria-label="Akright City home">
+                    <span class="brand-logo brand-logo--nav">
                         <img src="{{ App\Support\LegacyAsset::url('images/logo.png') }}" alt="ACRA Logo">
-                    </span>
-                    <span class="brand-copy">
-                        <strong>Akright City</strong>
-                        <span>Residents Association</span>
                     </span>
                 </a>
 
-                <nav class="desktop-nav" aria-label="Main navigation">
-                    <ul>
-                        <li>
-                            <a href="{{ route('home') }}" class="nav-link {{ request()->routeIs('home') ? 'is-current' : '' }}">Home</a>
-                        </li>
-                        <li>
-                            <a href="{{ route('about') }}" class="nav-link {{ request()->routeIs('about') ? 'is-current' : '' }}">About Us</a>
-                        </li>
-                        <li data-dropdown data-open="false">
-                            <button type="button" class="drop-trigger" data-dropdown-trigger aria-expanded="false">Team <span aria-hidden="true">⌄</span></button>
-                            <ul class="mega-menu">
-                                <li class="mega-title">Association Leadership</li>
-                                <li><a href="{{ route('team') }}#executive">Executive Committee</a></li>
-                                <li><a href="{{ route('team') }}#council">Council Members</a></li>
-                                <li><a href="{{ route('team') }}#conciliatory">Conciliatory Committee</a></li>
-                            </ul>
-                        </li>
-                        <li data-dropdown data-open="false">
-                            <button type="button" class="drop-trigger" data-dropdown-trigger aria-expanded="false">Villages <span aria-hidden="true">⌄</span></button>
-                            <ul class="mega-menu">
-                                <li class="mega-title">Our Twelve Villages</li>
-                                @foreach (App\Models\Village::orderBy('sort_order')->get() as $village)
-                                    <li><a href="{{ route('villages.show', $village->slug) }}">{{ str_replace(' Village', '', $village->name) }}</a></li>
-                                @endforeach
-                            </ul>
-                        </li>
-                        <li>
-                            <a href="{{ route('reports') }}" class="nav-link {{ request()->routeIs('reports') ? 'is-current' : '' }}">Reports</a>
-                        </li>
-                        <li>
-                            <a href="{{ route('directory') }}" class="nav-link {{ request()->routeIs('directory') ? 'is-current' : '' }}">Directory</a>
-                        </li>
-                        <li>
-                            <a href="{{ route('news.index') }}" class="nav-link {{ request()->routeIs('news.*') ? 'is-current' : '' }}">News</a>
-                        </li>
-                        <li data-dropdown data-open="false">
-                            <button type="button" class="drop-trigger" data-dropdown-trigger aria-expanded="false">Watch &amp; Listen <span aria-hidden="true">⌄</span></button>
-                            <ul class="mega-menu">
-                                <li class="mega-title">Media Library</li>
-                                <li><a href="{{ route('gallery') }}">Photo Gallery</a></li>
-                                <li><a href="{{ route('youtube') }}">Youtube Channel</a></li>
-                            </ul>
-                        </li>
-                        <li data-dropdown data-open="false">
-                            <button type="button" class="drop-trigger" data-dropdown-trigger aria-expanded="false">Help &amp; Info <span aria-hidden="true">⌄</span></button>
-                            <ul class="mega-menu">
-                                <li class="mega-title">Resident Support</li>
-                                <li><a href="{{ route('faqs') }}">FAQS</a></li>
-                                <li><a href="{{ route('contact') }}">Find Us</a></li>
-                            </ul>
-                        </li>
-                    </ul>
-                </nav>
+                <ul class="nav-links nav-right" id="menu-header-right">
+                    <li><a href="{{ route('reports') }}" class="nav-link {{ request()->routeIs('reports') ? 'is-current' : '' }}" @if(request()->routeIs('reports')) aria-current="page" @endif>Reports</a></li>
+                    <li><a href="{{ route('news.index') }}" class="nav-link {{ request()->routeIs('news.*') ? 'is-current' : '' }}" @if(request()->routeIs('news.*')) aria-current="page" @endif>News</a></li>
+                    <li class="has-dropdown" data-dropdown data-open="false">
+                        <a href="{{ route('faqs') }}" class="nav-link {{ request()->routeIs('faqs', 'gallery', 'youtube', 'contact', 'directory') ? 'is-current' : '' }}" data-dropdown-trigger aria-expanded="false" aria-controls="menu-help">
+                            Help &amp; Info
+                            <svg class="nav-chevron" viewBox="0 0 12 8" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path stroke-linecap="round" d="m1 1 5 5 5-5"/></svg>
+                        </a>
+                        <div class="mega-menu narrow" id="menu-help">
+                            <div class="mega-menu-content">
+                                <div class="mega-menu-section">
+                                    <h4>Community</h4>
+                                    <ul>
+                                        <li><a href="{{ route('directory') }}"><i aria-hidden="true"></i> Community Directory</a></li>
+                                        <li><a href="{{ route('contact') }}"><i aria-hidden="true"></i> Find Us</a></li>
+                                        <li><a href="{{ route('faqs') }}" class="mega-all"><i aria-hidden="true"></i> FAQs</a></li>
+                                    </ul>
+                                </div>
+                                <div class="mega-menu-section">
+                                    <h4>Watch &amp; Listen</h4>
+                                    <ul>
+                                        <li><a href="{{ route('gallery') }}"><i aria-hidden="true"></i> Photo Gallery</a></li>
+                                        <li><a href="{{ route('youtube') }}"><i aria-hidden="true"></i> YouTube Channel</a></li>
+                                        <li><a href="{{ route('reports') }}" class="mega-all"><i aria-hidden="true"></i> Reports &amp; Documents</a></li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </li>
+                </ul>
 
-                <a href="{{ route('payments') }}" class="btn btn-gold header-cta">Payments</a>
+                <a href="{{ route('payments') }}" class="cta-button">Payments</a>
             </div>
-        </div>
+        </nav>
     </header>
 
-    <div class="mobile-nav-overlay" data-mobile-overlay aria-hidden="true"></div>
+    <div class="mobile-nav-overlay" id="mobile-nav-overlay" data-mobile-overlay aria-hidden="true"></div>
 
-    <aside id="mobile-navigation" class="mobile-nav" data-mobile-nav aria-hidden="true" aria-label="Mobile navigation">
-        <div class="mobile-nav-top">
-            <span class="section-label">Navigation</span>
-            <button type="button" data-mobile-close class="mobile-nav-close" aria-label="Close navigation">Close ×</button>
+    <aside id="mobile-navigation" class="mobile-nav" data-mobile-nav data-lenis-prevent aria-hidden="true" aria-modal="true" role="dialog" aria-label="Mobile navigation">
+        <div class="mobile-nav-header">
+            <a href="{{ route('home') }}" class="mobile-nav-logo" aria-label="Akright City home">
+                <span class="brand-logo brand-logo--mobile">
+                    <img src="{{ App\Support\LegacyAsset::url('images/logo.png') }}" alt="ACRA Logo">
+                </span>
+            </a>
+            <button type="button" class="mobile-close-btn" id="mobile-close-btn" data-mobile-close aria-label="Close Menu">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path stroke-linecap="round" d="M6 6l12 12M18 6 6 18"/></svg>
+            </button>
         </div>
 
-        <ul class="mobile-nav-main">
+        <ul class="mobile-menu">
             <li><a href="{{ route('home') }}">Home</a></li>
             <li><a href="{{ route('about') }}">About Us</a></li>
             <li>
-                <details>
-                    <summary>Team <span aria-hidden="true">⌄</span></summary>
-                    <div class="mobile-submenu">
-                        <a href="{{ route('team') }}#executive">Executive Committee</a>
-                        <a href="{{ route('team') }}#council">Council Members</a>
-                        <a href="{{ route('team') }}#conciliatory">Conciliatory Committee</a>
-                    </div>
-                </details>
+                <button type="button" class="mobile-submenu-toggle" data-mobile-submenu-toggle aria-expanded="false" aria-controls="mobile-menu-team">
+                    Team
+                    <svg class="nav-chevron" viewBox="0 0 12 8" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path stroke-linecap="round" d="m1 1 5 5 5-5"/></svg>
+                </button>
+                <ul class="mobile-submenu" id="mobile-menu-team">
+                    <li><a href="{{ route('team') }}">All Leadership</a></li>
+                    <li class="mobile-subhead"><span>Association</span></li>
+                    <li><a href="{{ route('team') }}#executive">Executive Committee</a></li>
+                    <li><a href="{{ route('team') }}#council">Council Members</a></li>
+                    <li><a href="{{ route('team') }}#conciliatory">Conciliatory Committee</a></li>
+                </ul>
             </li>
             <li>
-                <details>
-                    <summary>Villages <span aria-hidden="true">⌄</span></summary>
-                    <div class="mobile-submenu">
-                        @foreach (App\Models\Village::orderBy('sort_order')->get() as $village)
-                            <a href="{{ route('villages.show', $village->slug) }}">{{ str_replace(' Village', '', $village->name) }}</a>
-                        @endforeach
-                    </div>
-                </details>
+                <button type="button" class="mobile-submenu-toggle" data-mobile-submenu-toggle aria-expanded="false" aria-controls="mobile-menu-villages">
+                    Villages
+                    <svg class="nav-chevron" viewBox="0 0 12 8" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path stroke-linecap="round" d="m1 1 5 5 5-5"/></svg>
+                </button>
+                <ul class="mobile-submenu" id="mobile-menu-villages">
+                    <li><a href="{{ route('villages.index') }}">All Villages</a></li>
+                    @foreach ($navVillages as $village)
+                        <li><a href="{{ route('villages.show', $village->slug) }}">{{ str_replace(' Village', '', $village->name) }}</a></li>
+                    @endforeach
+                </ul>
             </li>
-            <li><a href="{{ route('reports') }}">Reports</a></li>
-            <li><a href="{{ route('directory') }}">Directory</a></li>
+            <li><a href="{{ route('reports') }}">Reports &amp; Documents</a></li>
             <li><a href="{{ route('news.index') }}">News</a></li>
             <li>
-                <details>
-                    <summary>Watch &amp; Listen <span aria-hidden="true">⌄</span></summary>
-                    <div class="mobile-submenu">
-                        <a href="{{ route('gallery') }}">Photo Gallery</a>
-                        <a href="{{ route('youtube') }}">Youtube Channel</a>
-                    </div>
-                </details>
+                <button type="button" class="mobile-submenu-toggle" data-mobile-submenu-toggle aria-expanded="false" aria-controls="mobile-menu-help">
+                    Help &amp; Info
+                    <svg class="nav-chevron" viewBox="0 0 12 8" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path stroke-linecap="round" d="m1 1 5 5 5-5"/></svg>
+                </button>
+                <ul class="mobile-submenu" id="mobile-menu-help">
+                    <li><a href="{{ route('directory') }}">Community Directory</a></li>
+                    <li><a href="{{ route('faqs') }}">FAQs</a></li>
+                    <li><a href="{{ route('gallery') }}">Photo Gallery</a></li>
+                    <li><a href="{{ route('youtube') }}">YouTube Channel</a></li>
+                    <li><a href="{{ route('contact') }}">Find Us</a></li>
+                </ul>
             </li>
-            <li>
-                <details>
-                    <summary>Help &amp; Info <span aria-hidden="true">⌄</span></summary>
-                    <div class="mobile-submenu">
-                        <a href="{{ route('faqs') }}">FAQS</a>
-                        <a href="{{ route('contact') }}">Find Us</a>
-                    </div>
-                </details>
-            </li>
+            <li class="mobile-cta"><a href="{{ route('payments') }}" class="cta-button">Payments</a></li>
         </ul>
-
-        <a href="{{ route('payments') }}" class="btn btn-gold header-cta">Payments</a>
     </aside>
 
-    <main>
+    <main id="main-content">
         @yield('content')
     </main>
 
@@ -188,9 +235,9 @@
                 <h2>Explore</h2>
                 <ul>
                     <li><a href="{{ route('about') }}">About Us</a></li>
-                    <li><a href="{{ route('directory') }}">Services</a></li>
+                    <li><a href="{{ route('directory') }}">Community Directory</a></li>
                     <li><a href="{{ route('gallery') }}">Gallery</a></li>
-                    <li><a href="{{ route('youtube') }}">Youtube Channel</a></li>
+                    <li><a href="{{ route('youtube') }}">YouTube Channel</a></li>
                 </ul>
             </div>
             <div>

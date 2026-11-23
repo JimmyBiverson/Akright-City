@@ -7,14 +7,13 @@
 @php
     $sliderVillages = $villages->take(10);
     $ctaRoutes = ['Learn More' => route('about'), 'Contact Us' => route('contact')];
-    $galleryImage = $home->data['gallery']['image'] ?? App\Support\LegacyAsset::url('images/slide1.jpeg');
 @endphp
 
 <section class="hero-slider" data-hero>
     <canvas class="particle-canvas" data-particles aria-hidden="true"></canvas>
 
-    @foreach ($home->data['slides'] ?? [] as $index => $slide)
-        <div class="hero-slide {{ $index === 0 ? 'is-active' : '' }}" data-hero-slide data-hero-image="{{ $slide['image'] ?? '' }}">
+    @foreach ($slides as $index => $slide)
+        <div class="hero-slide {{ $index === 0 ? 'is-active' : '' }}" data-hero-slide data-hero-image="{{ $slide['image'] }}">
             <div class="hero-bg" style="background-image: url('{{ $slide['image'] ?? '' }}');"></div>
             <div class="hero-scrim"></div>
             <div class="container-site hero-content">
@@ -30,10 +29,10 @@
 
     <div class="hero-side">
         <div class="hero-thumbs" role="tablist" aria-label="Hero slides">
-            @foreach ($home->data['slides'] ?? [] as $index => $slide)
+            @foreach ($slides as $index => $slide)
                 <button type="button" class="hero-thumb {{ $index === 0 ? 'is-active' : '' }}" data-hero-thumb role="tab" aria-label="Go to slide {{ $index + 1 }}" aria-selected="{{ $index === 0 ? 'true' : 'false' }}">
                     <span class="hero-thumb-ring" data-hero-thumb-ring>
-                        <img src="{{ $slide['image'] ?? '' }}" alt="" loading="lazy">
+                        <img src="{{ $slide['thumbnail'] ?? $slide['image'] }}" alt="" loading="lazy">
                     </span>
                     <span>{{ $slide['cta'] }}</span>
                 </button>

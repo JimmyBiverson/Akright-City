@@ -5,7 +5,9 @@ namespace Tests\Feature;
 use App\Models\NewsPost;
 use App\Models\PageContent;
 use App\Models\Village;
+use App\Support\HeroImage;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Storage;
 use Tests\TestCase;
 
 class SitePagesTest extends TestCase
@@ -60,6 +62,52 @@ class SitePagesTest extends TestCase
             ->assertSee('Pay your ACRA subscription securely through the official Akright City payment portal.')
             ->assertSee('Open Secure Payment Form')
             ->assertSee('https://my.akrightcity.com/?dad=index&amp;jc=order&amp;a=form&amp;package=79', false);
+    }
+
+    public function test_home_page_renders_responsive_navigation_structure(): void
+    {
+        $this->seedBaseContent();
+
+        $this->get(route('home'))
+            ->assertOk()
+            ->assertSee('id="safari-header"', false)
+            ->assertSee('id="mobile-navigation"', false)
+            ->assertSee('data-mobile-submenu-toggle', false)
+            ->assertSee('id="menu-villages"', false)
+            ->assertSee('Payments');
+    }
+
+    public function test_hero_images_use_optimized_local_variants(): void
+    {
+        $this->seedBaseContent();
+        $home = PageContent::where('key', 'home')->firstOrFail();
+        $data = $home->data;
+        $data['slides'][0]['image'] = 'https://akrightcity.com/en/images/slide1.jpeg';
+        $home->update(['data' => $data]);
+
+        $this->assertSame('slide1.webp', HeroImage::imagePathFor($data['slides'][0]['image']));
+
+        $created = [];
+
+        foreach (['hero/slide1.webp', 'hero/slide1-thumb.webp'] as $path) {
+            if (! Storage::disk('public')->exists($path)) {
+                Storage::disk('public')->put($path, 'test');
+                $created[] = $path;
+            }
+        }
+
+        try {
+            $this->get(route('home'))
+                ->assertOk()
+                ->assertSee('data-hero-image="', false)
+                ->assertSee('hero/slide1.webp', false)
+                ->assertSee('hero/slide1-thumb.webp', false)
+                ->assertDontSee('data-hero-image="https://akrightcity.com/en/images/slide1.jpeg"', false);
+        } finally {
+            foreach ($created as $path) {
+                Storage::disk('public')->delete($path);
+            }
+        }
     }
 
     public function test_sitemap_lists_public_and_dynamic_urls(): void

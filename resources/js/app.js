@@ -37,9 +37,15 @@ document.addEventListener('DOMContentLoaded', () => {
     const stopScroll = () => lenis?.stop();
     const startScroll = () => lenis?.start();
 
+    const refreshScrollTriggers = () => ScrollTrigger.refresh();
     const header = document.querySelector('[data-site-header]');
+    const mainNav = document.querySelector('[data-main-nav]');
+    const isHome = document.body.classList.contains('home');
+
     const updateHeader = () => {
-        header?.classList.toggle('is-scrolled', window.scrollY > 40);
+        const scrolled = !isHome && window.scrollY > 40;
+        header?.classList.toggle('is-scrolled', scrolled);
+        mainNav?.classList.toggle('is-scrolled', scrolled);
     };
 
     updateHeader();
@@ -49,11 +55,12 @@ document.addEventListener('DOMContentLoaded', () => {
     const mobileOverlay = document.querySelector('[data-mobile-overlay]');
     const mobileOpen = document.querySelector('[data-mobile-open]');
     const mobileClose = document.querySelector('[data-mobile-close]');
+    const focusableSelector = 'a[href], button:not([disabled]), [tabindex]:not([tabindex="-1"])';
     let lastFocusedElement = null;
     let lockedScrollY = 0;
 
     const closeMobileNav = () => {
-        if (!mobileNav || !mobileOverlay) {
+        if (!mobileNav || !mobileOverlay || !mobileNav.classList.contains('is-open')) {
             return;
         }
 
@@ -66,6 +73,7 @@ document.addEventListener('DOMContentLoaded', () => {
         window.scrollTo(0, lockedScrollY);
         lenis?.scrollTo(lockedScrollY, { immediate: true, force: true });
         startScroll();
+        refreshScrollTriggers();
         lastFocusedElement?.focus();
     };
 
@@ -94,45 +102,111 @@ document.addEventListener('DOMContentLoaded', () => {
         link.addEventListener('click', closeMobileNav);
     });
 
+    mobileNav?.querySelectorAll('[data-mobile-submenu-toggle]').forEach((toggle) => {
+        toggle.addEventListener('click', () => {
+            const submenu = document.getElementById(toggle.getAttribute('aria-controls') ?? '');
+            if (!submenu) {
+                return;
+            }
+
+            const open = submenu.classList.toggle('open');
+            toggle.setAttribute('aria-expanded', String(open));
+            refreshScrollTriggers();
+        });
+    });
+
     document.addEventListener('keydown', (event) => {
-        if (event.key === 'Escape' && mobileNav?.classList.contains('is-open')) {
+        if (!mobileNav?.classList.contains('is-open')) {
+            return;
+        }
+
+        if (event.key === 'Escape') {
             closeMobileNav();
+            return;
+        }
+
+        if (event.key !== 'Tab') {
+            return;
+        }
+
+        const focusable = Array.from(mobileNav.querySelectorAll(focusableSelector));
+        if (focusable.length === 0) {
+            return;
+        }
+
+        const first = focusable[0];
+        const last = focusable[focusable.length - 1];
+
+        if (event.shiftKey && document.activeElement === first) {
+            event.preventDefault();
+            last.focus();
+        } else if (!event.shiftKey && document.activeElement === last) {
+            event.preventDefault();
+            first.focus();
         }
     });
 
     window.addEventListener('resize', () => {
-        if (window.innerWidth > 1023 && mobileNav?.classList.contains('is-open')) {
+        if (window.innerWidth > 991 && mobileNav?.classList.contains('is-open')) {
             closeMobileNav();
         }
     });
 
-    document.querySelectorAll('[data-dropdown]').forEach((dropdown) => {
+    const dropdowns = Array.from(document.querySelectorAll('.has-dropdown'));
+    const hoverCapable = window.matchMedia('(hover: hover)').matches;
+
+    const closeDropdowns = (except = null) => {
+        dropdowns.forEach((dropdown) => {
+            if (dropdown !== except) {
+                dropdown.setAttribute('data-open', 'false');
+                dropdown.querySelector('[data-dropdown-trigger]')?.setAttribute('aria-expanded', 'false');
+            }
+        });
+    };
+
+    dropdowns.forEach((dropdown) => {
         const trigger = dropdown.querySelector('[data-dropdown-trigger]');
 
         const setOpen = (open) => {
+            if (open) {
+                closeDropdowns(dropdown);
+            }
+
             dropdown.setAttribute('data-open', String(open));
             trigger?.setAttribute('aria-expanded', String(open));
         };
 
         trigger?.addEventListener('click', (event) => {
-            event.preventDefault();
-            setOpen(dropdown.getAttribute('data-open') !== 'true');
+            if (!hoverCapable) {
+                event.preventDefault();
+                setOpen(dropdown.getAttribute('data-open') !== 'true');
+            }
         });
 
-        dropdown.addEventListener('mouseenter', () => setOpen(true));
-        dropdown.addEventListener('mouseleave', () => setOpen(false));
+        if (hoverCapable) {
+            dropdown.addEventListener('mouseenter', () => setOpen(true));
+            dropdown.addEventListener('mouseleave', () => setOpen(false));
+        }
+
+        dropdown.addEventListener('focusin', () => setOpen(true));
+        dropdown.addEventListener('focusout', (event) => {
+            if (!dropdown.contains(event.relatedTarget)) {
+                setOpen(false);
+            }
+        });
+
         dropdown.addEventListener('keydown', (event) => {
             if (event.key === 'Escape') {
                 setOpen(false);
                 trigger?.focus();
             }
         });
+    });
 
-        document.addEventListener('click', (event) => {
-            if (!dropdown.contains(event.target)) {
-                setOpen(false);
-            }
-        });
+    document.addEventListener('click', (event) => {
+        if (!dropdowns.some((dropdown) => dropdown.contains(event.target))) {
+            closeDropdowns();
+        }
     });
 
     document.querySelectorAll('[data-tabs]').forEach((group) => {
@@ -500,7 +574,13 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    const headerOffset = () => (window.innerWidth > 1023 ? 116 : 92);
+    const headerOffset = () => {
+        if (isHome) {
+            return 16;
+        }
+
+        return (header?.offsetHeight ?? 0) + 8;
+    };
 
     document.querySelectorAll('a[href*="#"]').forEach((link) => {
         link.addEventListener('click', (event) => {

@@ -12,6 +12,7 @@ use App\Models\Report;
 use App\Models\TeamMember;
 use App\Models\Video;
 use App\Models\Village;
+use App\Support\HeroImage;
 use Illuminate\Contracts\View\View;
 
 class SiteController extends Controller
@@ -28,8 +29,24 @@ class SiteController extends Controller
             ->values();
         $leadership = TeamMember::where('group', 'home-leadership')->orderBy('sort_order')->get();
         $partners = Partner::orderBy('sort_order')->get();
+        $slides = [];
 
-        return view('pages.home', compact('home', 'president', 'villages', 'news', 'leadership', 'partners'));
+        foreach ($home->data['slides'] ?? [] as $slide) {
+            if (! is_array($slide)) {
+                continue;
+            }
+
+            $originalImage = (string) ($slide['image'] ?? 'images/slide1.jpeg');
+            $slides[] = [
+                ...$slide,
+                'image' => HeroImage::urlFor($originalImage),
+                'thumbnail' => HeroImage::thumbnailUrlFor($originalImage),
+            ];
+        }
+
+        $galleryImage = HeroImage::urlFor((string) ($home->data['gallery']['image'] ?? 'images/slide1.jpeg'));
+
+        return view('pages.home', compact('home', 'president', 'villages', 'news', 'leadership', 'partners', 'slides', 'galleryImage'));
     }
 
     public function about(): View
