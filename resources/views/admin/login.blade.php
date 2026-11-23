@@ -4,12 +4,14 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="robots" content="noindex, nofollow">
+    <link rel="icon" type="image/x-icon" href="{{ asset('favicon.ico') }}">
+    <link rel="shortcut icon" href="{{ asset('favicon.ico') }}">
     <title>Admin Login | Akright City</title>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 <body class="flex min-h-screen items-center justify-center bg-slate-100 p-6">
     <div class="card w-full max-w-md p-8">
-        <img src="{{ App\Support\LegacyAsset::url('images/logo.png') }}" alt="ACRA Logo" class="mx-auto h-14 w-14 rounded-full">
+        <img src="{{ asset('acra-logo.png') }}" alt="ACRA Logo" class="mx-auto h-14 w-14 rounded-full">
         <h1 class="mt-5 text-center text-2xl font-bold">ACRA Admin</h1>
         <p class="mt-1 text-center text-sm text-slate-500">Sign in to manage community content.</p>
 

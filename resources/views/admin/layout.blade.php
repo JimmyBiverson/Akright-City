@@ -4,6 +4,8 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="robots" content="noindex, nofollow">
+    <link rel="icon" type="image/x-icon" href="{{ asset('favicon.ico') }}">
+    <link rel="shortcut icon" href="{{ asset('favicon.ico') }}">
     <title>@hasSection('title') @yield('title') | @endif ACRA Admin</title>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
@@ -11,7 +13,7 @@
     <div class="min-h-screen lg:grid lg:grid-cols-[240px,1fr]">
         <aside class="border-b border-slate-200 bg-white p-5 lg:min-h-screen lg:border-b-0 lg:border-r">
             <a href="{{ route('home') }}" class="flex items-center gap-2 font-bold text-ink-900">
-                <img src="{{ App\Support\LegacyAsset::url('images/logo.png') }}" alt="ACRA Logo" class="h-9 w-9 rounded-full">
+                <img src="{{ asset('acra-logo.png') }}" alt="ACRA Logo" class="h-9 w-9 rounded-full">
                 ACRA Admin
             </a>
             <nav class="mt-6 grid gap-1 text-sm" aria-label="Admin navigation">

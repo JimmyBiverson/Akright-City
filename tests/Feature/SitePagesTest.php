@@ -72,8 +72,8 @@ class SitePagesTest extends TestCase
             'name' => 'Suncity Village',
         ]);
 
-        $this->assertFileExists(public_path('acra-logo-header.png'));
-        $this->assertSame('image/png', getimagesize(public_path('acra-logo-header.png'))['mime']);
+        $this->assertFileExists(public_path('acra-logo.png'));
+        $this->assertSame('image/png', getimagesize(public_path('acra-logo.png'))['mime']);
 
         $this->get(route('home'))
             ->assertOk()
@@ -86,8 +86,31 @@ class SitePagesTest extends TestCase
             ->assertSee('class="mega-menu narrow" id="menu-help"', false)
             ->assertDontSee('class="mega-menu" id="menu-villages"', false)
             ->assertSee('Suncity', false)
-            ->assertSee('acra-logo-header.png', false)
+            ->assertSee('acra-logo.png', false)
             ->assertSee('Payments');
+    }
+
+    public function test_local_branding_assets_and_social_metadata_are_rendered(): void
+    {
+        $this->seedBaseContent();
+
+        $this->assertFileExists(public_path('favicon.ico'));
+        $this->assertSame('image/vnd.microsoft.icon', getimagesize(public_path('favicon.ico'))['mime']);
+        $this->assertFileExists(public_path('acra-logo.png'));
+        $this->assertSame('image/png', getimagesize(public_path('acra-logo.png'))['mime']);
+        $this->assertFileExists(public_path('acra-social-preview.jpg'));
+        $this->assertSame('image/jpeg', getimagesize(public_path('acra-social-preview.jpg'))['mime']);
+
+        $this->get(route('home'))
+            ->assertOk()
+            ->assertSee('rel="icon" type="image/x-icon"', false)
+            ->assertSee('favicon.ico', false)
+            ->assertSee('property="og:image"', false)
+            ->assertSee('acra-social-preview.jpg', false)
+            ->assertSee('property="og:image:width" content="1024"', false)
+            ->assertSee('property="og:image:height" content="1024"', false)
+            ->assertSee('name="twitter:card" content="summary_large_image"', false)
+            ->assertSee('name="twitter:image"', false);
     }
 
     public function test_hero_images_use_optimized_local_variants(): void

@@ -7,9 +7,22 @@
     <meta name="description" content="@yield('description', 'Akright City Residents Association')">
     <title>@hasSection('title') @yield('title') | Akright City @else Akright City Residents Association @endif</title>
     <link rel="canonical" href="{{ url()->current() }}">
+    <link rel="icon" type="image/x-icon" href="{{ asset('favicon.ico') }}">
+    <link rel="shortcut icon" href="{{ asset('favicon.ico') }}">
     <meta property="og:title" content="@yield('title', 'Akright City Residents Association')">
     <meta property="og:type" content="website">
     <meta property="og:url" content="{{ url()->current() }}">
+    <meta property="og:site_name" content="Akright City Residents Association">
+    <meta property="og:description" content="@yield('description', 'Akright City Residents Association')">
+    <meta property="og:image" content="{{ asset('acra-social-preview.jpg') }}">
+    <meta property="og:image:secure_url" content="{{ secure_asset('acra-social-preview.jpg') }}">
+    <meta property="og:image:type" content="image/jpeg">
+    <meta property="og:image:width" content="1024">
+    <meta property="og:image:height" content="1024">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="@yield('title', 'Akright City Residents Association')">
+    <meta name="twitter:description" content="@yield('description', 'Akright City Residents Association')">
+    <meta name="twitter:image" content="{{ asset('acra-social-preview.jpg') }}">
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 <body class="min-h-screen {{ request()->routeIs('home') ? 'home' : 'inner-page' }}">
@@ -100,7 +113,7 @@
 
                 <a href="{{ route('home') }}" class="nav-logo" aria-label="Akright City home">
                     <span class="brand-logo brand-logo--nav">
-                        <img src="{{ asset('acra-logo-header.png') }}" alt="ACRA Logo">
+                        <img src="{{ asset('acra-logo.png') }}" alt="ACRA Logo">
                     </span>
                 </a>
 
@@ -146,7 +159,7 @@
         <div class="mobile-nav-header">
             <a href="{{ route('home') }}" class="mobile-nav-logo" aria-label="Akright City home">
                 <span class="brand-logo brand-logo--mobile">
-                    <img src="{{ asset('acra-logo-header.png') }}" alt="ACRA Logo">
+                    <img src="{{ asset('acra-logo.png') }}" alt="ACRA Logo">
                 </span>
             </a>
             <button type="button" class="mobile-close-btn" id="mobile-close-btn" data-mobile-close aria-label="Close Menu">
@@ -221,12 +234,12 @@
         <div class="container-site footer-top">
             <div class="footer-brand">
                 <span class="brand-plate">
-                    <img src="{{ App\Support\LegacyAsset::url('images/logo.png') }}" alt="ACRA Logo" loading="lazy">
+                    <img src="{{ asset('acra-logo.png') }}" alt="ACRA Logo" loading="lazy">
                 </span>
                 <div>
                     <strong>Akright City Residents Association</strong>
                     <p>Akright City, Entebbe Road<br>info@akrightcity.com</p>
-                    <img src="{{ App\Support\LegacyAsset::url('images/social.png') }}" alt="Social Media" class="mt-4 h-8" loading="lazy">
+                    <img src="{{ asset('acra-social-preview.jpg') }}" alt="Social Media" class="mt-4 h-8" loading="lazy">
                 </div>
             </div>
             <div>
