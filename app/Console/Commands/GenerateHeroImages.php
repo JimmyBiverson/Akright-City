@@ -24,6 +24,12 @@ class GenerateHeroImages extends Command
     public function handle(): int
     {
         ini_set('memory_limit', '512M');
+        $publicHeroPath = public_path('hero');
+
+        if (! is_dir($publicHeroPath)) {
+            mkdir($publicHeroPath, 0755, true);
+        }
+
         Storage::disk('public')->makeDirectory('hero');
         $generated = 0;
         $skipped = 0;
@@ -33,15 +39,26 @@ class GenerateHeroImages extends Command
             $source = 'legacy/'.$definition['source'];
             $image = 'hero/'.$definition['image'];
             $thumbnail = 'hero/'.$definition['thumbnail'];
+            $publicImagePath = $publicHeroPath.DIRECTORY_SEPARATOR.$definition['image'];
+            $publicThumbnailPath = $publicHeroPath.DIRECTORY_SEPARATOR.$definition['thumbnail'];
 
-            if (! Storage::disk('public')->exists($source)) {
+            $sourcePath = Storage::disk('public')->exists($source) ? Storage::disk('public')->path($source) : null;
+
+            if ($sourcePath === null) {
+                $local = LegacyAsset::localPath($definition['source']);
+                if ($local !== null && Storage::disk('public')->exists('legacy/'.$local)) {
+                    $sourcePath = Storage::disk('public')->path('legacy/'.$local);
+                }
+            }
+
+            if ($sourcePath === null) {
                 $failed++;
                 $this->warn("Missing: {$source}");
 
                 continue;
             }
 
-            if (! $this->option('force') && Storage::disk('public')->exists($image) && Storage::disk('public')->exists($thumbnail)) {
+            if (! $this->option('force') && is_file($publicImagePath) && is_file($publicThumbnailPath)) {
                 $skipped++;
                 $this->line("Skipped: {$key}");
 
@@ -50,20 +67,23 @@ class GenerateHeroImages extends Command
 
             try {
                 $this->generate(
-                    Storage::disk('public')->path($source),
-                    Storage::disk('public')->path($image),
+                    $sourcePath,
+                    $publicImagePath,
                     self::IMAGE_WIDTH,
                     self::IMAGE_HEIGHT,
                     $definition['position'],
                 );
 
                 $this->generate(
-                    Storage::disk('public')->path($source),
-                    Storage::disk('public')->path($thumbnail),
+                    $sourcePath,
+                    $publicThumbnailPath,
                     self::THUMB_WIDTH,
                     self::THUMB_HEIGHT,
                     $definition['position'],
                 );
+
+                @copy($publicImagePath, Storage::disk('public')->path($image));
+                @copy($publicThumbnailPath, Storage::disk('public')->path($thumbnail));
 
                 $generated++;
                 $this->info("Generated: {$key}");

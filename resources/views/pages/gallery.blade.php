@@ -32,8 +32,8 @@
                         <h2 class="text-xl font-semibold text-brand-900">{{ $category }}</h2>
                         <div class="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
                             @foreach ($items as $image)
-                                <button type="button" data-gallery-image="{{ $image->path }}" data-gallery-alt="{{ $image->alt_text ?: ($image->title ?: $category) }}" class="group overflow-hidden rounded-2xl bg-white text-left shadow-sm" aria-label="View {{ $image->title ?: $category }} image" data-reveal>
-                                    <img src="{{ $image->path }}" alt="{{ $image->alt_text ?: ($image->title ?: $category) }}" loading="lazy" class="h-56 w-full object-cover transition duration-500 group-hover:scale-105">
+                                <button type="button" data-gallery-image="{{ $image->display_path ?? $image->path }}" data-gallery-alt="{{ $image->alt_text ?: ($image->title ?: $category) }}" class="group overflow-hidden rounded-2xl bg-white text-left shadow-sm" aria-label="View {{ $image->title ?: $category }} image" data-reveal>
+                                    <img src="{{ $image->display_path ?? $image->path }}" alt="{{ $image->alt_text ?: ($image->title ?: $category) }}" loading="lazy" decoding="async" class="h-56 w-full object-cover transition duration-500 group-hover:scale-105">
                                 </button>
                             @endforeach
                         </div>

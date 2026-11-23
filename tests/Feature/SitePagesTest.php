@@ -7,7 +7,6 @@ use App\Models\PageContent;
 use App\Models\Village;
 use App\Support\HeroImage;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Support\Facades\Storage;
 use Tests\TestCase;
 
 class SitePagesTest extends TestCase
@@ -154,12 +153,15 @@ class SitePagesTest extends TestCase
         $home->update(['data' => $data]);
 
         $this->assertSame('slide1.webp', HeroImage::imagePathFor($data['slides'][0]['image']));
-
         $created = [];
 
-        foreach (['hero/slide1.webp', 'hero/slide1-thumb.webp'] as $path) {
-            if (! Storage::disk('public')->exists($path)) {
-                Storage::disk('public')->put($path, 'test');
+        foreach (['slide1.webp', 'slide1-thumb.webp'] as $file) {
+            $path = public_path('hero/'.$file);
+            if (! is_file($path)) {
+                if (! is_dir(dirname($path))) {
+                    mkdir(dirname($path), 0755, true);
+                }
+                file_put_contents($path, 'test');
                 $created[] = $path;
             }
         }
@@ -168,12 +170,12 @@ class SitePagesTest extends TestCase
             $this->get(route('home'))
                 ->assertOk()
                 ->assertSee('data-hero-image="', false)
-                ->assertSee('hero/slide1.webp', false)
-                ->assertSee('hero/slide1-thumb.webp', false)
+                ->assertSee('/hero/slide1.webp', false)
+                ->assertSee('/hero/slide1-thumb.webp', false)
                 ->assertDontSee('data-hero-image="https://akrightcity.com/en/images/slide1.jpeg"', false);
         } finally {
             foreach ($created as $path) {
-                Storage::disk('public')->delete($path);
+                @unlink($path);
             }
         }
     }

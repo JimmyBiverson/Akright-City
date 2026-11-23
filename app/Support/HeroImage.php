@@ -33,7 +33,7 @@ class HeroImage
             'position' => 'center',
         ],
         'images/slide2.jpeg' => [
-            'source' => 'images/gallery/2026/Mens Day/DEN_0898.jpg',
+            'source' => 'images/gallery/2026/Mens Day/DEN_0898-compressed-compressed.webp',
             'image' => 'slide2.webp',
             'thumbnail' => 'slide2-thumb.webp',
             'position' => 'center',
@@ -78,6 +78,10 @@ class HeroImage
     {
         $image = self::imagePathFor($path);
 
+        if ($image !== null && is_file(public_path('hero/'.$image))) {
+            return asset('hero/'.$image);
+        }
+
         if ($image !== null && Storage::disk('public')->exists('hero/'.$image)) {
             return Storage::url('hero/'.$image);
         }
@@ -88,6 +92,10 @@ class HeroImage
     public static function thumbnailUrlFor(string $path): string
     {
         $thumbnail = self::thumbnailPathFor($path);
+
+        if ($thumbnail !== null && is_file(public_path('hero/'.$thumbnail))) {
+            return asset('hero/'.$thumbnail);
+        }
 
         if ($thumbnail !== null && Storage::disk('public')->exists('hero/'.$thumbnail)) {
             return Storage::url('hero/'.$thumbnail);

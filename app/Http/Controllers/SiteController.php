@@ -13,6 +13,7 @@ use App\Models\TeamMember;
 use App\Models\Video;
 use App\Models\Village;
 use App\Support\HeroImage;
+use App\Support\LegacyAsset;
 use Illuminate\Contracts\View\View;
 
 class SiteController extends Controller
@@ -145,7 +146,12 @@ class SiteController extends Controller
         ];
         $images = GalleryImage::all()
             ->sortBy(fn (GalleryImage $image): array => [-$image->year, $categoryOrder[$image->category] ?? 99, $image->sort_order])
-            ->values();
+            ->values()
+            ->map(function (GalleryImage $image): GalleryImage {
+                $image->setAttribute('display_path', LegacyAsset::url($image->path));
+
+                return $image;
+            });
         $years = $images->pluck('year')->unique()->values();
 
         return view('pages.gallery', compact('page', 'images', 'years'));

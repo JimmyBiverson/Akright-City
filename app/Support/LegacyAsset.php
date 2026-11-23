@@ -13,6 +13,16 @@ class LegacyAsset
     public static function url(string $path): string
     {
         if (Str::startsWith($path, ['https://', 'http://'])) {
+            $normalizedRemote = self::normalizePath($path);
+
+            if ($normalizedRemote !== '' && ! str_contains($normalizedRemote, '..')) {
+                $local = self::localPath($normalizedRemote);
+
+                if ($local !== null) {
+                    return self::$resolved[$path] = Storage::url('legacy/'.$local);
+                }
+            }
+
             return $path;
         }
 
@@ -22,11 +32,58 @@ class LegacyAsset
 
         $normalized = self::normalizePath($path);
 
-        if ($normalized !== '' && ! str_contains($normalized, '..') && Storage::disk('public')->exists('legacy/'.$normalized)) {
-            return self::$resolved[$path] = Storage::url('legacy/'.$normalized);
+        if ($normalized !== '' && ! str_contains($normalized, '..')) {
+            $local = self::localPath($normalized);
+
+            if ($local !== null) {
+                return self::$resolved[$path] = Storage::url('legacy/'.$local);
+            }
         }
 
         return self::$resolved[$path] = self::remoteUrl($normalized);
+    }
+
+    public static function localPath(string $path): ?string
+    {
+        $normalized = self::normalizePath($path);
+
+        if ($normalized === '' || str_contains($normalized, '..')) {
+            return null;
+        }
+
+        foreach (self::localCandidates($normalized) as $candidate) {
+            if (Storage::disk('public')->exists('legacy/'.$candidate)) {
+                return $candidate;
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * @return array<int, string>
+     */
+    private static function localCandidates(string $path): array
+    {
+        $candidates = [$path];
+        $extension = pathinfo($path, PATHINFO_EXTENSION);
+        $base = $extension !== '' ? substr($path, 0, -(strlen($extension) + 1)) : $path;
+
+        foreach (['-compressed-compressed', '-compressed'] as $suffix) {
+            foreach ([$extension, 'webp', 'jpg', 'jpeg', 'png'] as $candidateExtension) {
+                if ($candidateExtension === '') {
+                    continue;
+                }
+
+                $candidates[] = $base.$suffix.'.'.$candidateExtension;
+            }
+        }
+
+        if (in_array(strtolower($extension), ['jpg', 'jpeg', 'png'], true)) {
+            $candidates[] = $base.'.webp';
+        }
+
+        return array_values(array_unique($candidates));
     }
 
     public static function remoteUrl(string $path): string
