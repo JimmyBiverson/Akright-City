@@ -407,11 +407,6 @@ document.addEventListener('DOMContentLoaded', () => {
         nextButton?.addEventListener('click', () => showSlide(currentSlide + 1));
         previousButton?.addEventListener('click', () => showSlide(currentSlide - 1));
 
-        hero.addEventListener('mouseenter', () => window.clearTimeout(slideTimer));
-        hero.addEventListener('mouseleave', schedule);
-        hero.addEventListener('focusin', () => window.clearTimeout(slideTimer));
-        hero.addEventListener('focusout', schedule);
-
         document.addEventListener('visibilitychange', () => {
             if (document.hidden) {
                 window.clearTimeout(slideTimer);

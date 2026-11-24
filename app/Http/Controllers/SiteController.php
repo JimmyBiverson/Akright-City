@@ -20,8 +20,8 @@ class SiteController extends Controller
 {
     public function home(): View
     {
-        $home = PageContent::where('key', 'home')->firstOrFail();
-        $president = PageContent::where('key', 'president')->firstOrFail();
+        $home = PageContent::fallback('home');
+        $president = PageContent::fallback('president');
         $villages = Village::orderBy('sort_order')->get();
         $newsSlugs = ['the-akright-city-run-2026', 'international-womens-day', 'acra-2026-year-planner'];
         $news = NewsPost::whereIn('slug', $newsSlugs)
@@ -52,12 +52,12 @@ class SiteController extends Controller
 
     public function about(): View
     {
-        return view('pages.about', ['page' => PageContent::where('key', 'about')->firstOrFail()]);
+        return view('pages.about', ['page' => PageContent::fallback('about')]);
     }
 
     public function team(): View
     {
-        $page = PageContent::where('key', 'team')->firstOrFail();
+        $page = PageContent::fallback('team');
         $groupOrder = ['executive' => 1, 'council' => 2, 'conciliatory' => 3];
         $groups = TeamMember::whereIn('group', array_keys($groupOrder))
             ->get()
@@ -70,7 +70,7 @@ class SiteController extends Controller
     public function villages(): View
     {
         return view('pages.villages.index', [
-            'page' => PageContent::where('key', 'home')->firstOrFail(),
+            'page' => PageContent::fallback('home'),
             'villages' => Village::orderBy('sort_order')->get(),
         ]);
     }
@@ -84,7 +84,7 @@ class SiteController extends Controller
 
     public function reports(): View
     {
-        $page = PageContent::where('key', 'reports')->firstOrFail();
+        $page = PageContent::fallback('reports');
         $reports = Report::orderBy('year', 'desc')
             ->orderBy('sort_order')
             ->get()
@@ -95,7 +95,7 @@ class SiteController extends Controller
 
     public function directory(): View
     {
-        $page = PageContent::where('key', 'directory')->firstOrFail();
+        $page = PageContent::fallback('directory');
         $categoryOrder = [
             'Schools' => 1,
             'Restaurants & Bars' => 2,
@@ -114,7 +114,7 @@ class SiteController extends Controller
     public function news(): View
     {
         return view('pages.news.index', [
-            'page' => PageContent::where('key', 'news')->firstOrFail(),
+            'page' => PageContent::fallback('news'),
             'posts' => NewsPost::orderBy('sort_order')->get(),
         ]);
     }
@@ -129,14 +129,14 @@ class SiteController extends Controller
     public function faqs(): View
     {
         return view('pages.faqs', [
-            'page' => PageContent::where('key', 'faqs')->firstOrFail(),
+            'page' => PageContent::fallback('faqs'),
             'faqs' => Faq::orderBy('sort_order')->get(),
         ]);
     }
 
     public function gallery(): View
     {
-        $page = PageContent::where('key', 'gallery')->firstOrFail();
+        $page = PageContent::fallback('gallery');
         $categoryOrder = [
             'Youth Day' => 1,
             'Akright Run' => 2,
@@ -160,27 +160,20 @@ class SiteController extends Controller
     public function youtube(): View
     {
         return view('pages.youtube', [
-            'page' => PageContent::where('key', 'youtube')->firstOrFail(),
+            'page' => PageContent::fallback('youtube'),
             'videos' => Video::orderBy('sort_order')->get(),
         ]);
     }
 
     public function contact(): View
     {
-        return view('pages.contact', ['page' => PageContent::where('key', 'contact')->firstOrFail()]);
+        return view('pages.contact', ['page' => PageContent::fallback('contact')]);
     }
 
     public function payments(): View
     {
         return view('pages.payments', [
-            'page' => PageContent::where('key', 'payments')->firstOr(function () {
-                return PageContent::make([
-                    'key' => 'payments',
-                    'title' => 'Payments',
-                    'subtitle' => 'Pay your ACRA subscription securely through the official Akright City payment portal.',
-                    'meta_description' => 'Pay your ACRA subscription securely through the official Akright City payment portal.',
-                ]);
-            }),
+            'page' => PageContent::fallback('payments'),
             'paymentUrl' => 'https://my.akrightcity.com/?dad=index&jc=order&a=form&package=79',
         ]);
     }

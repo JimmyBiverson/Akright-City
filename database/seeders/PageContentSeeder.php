@@ -153,7 +153,7 @@ HTML,
         ];
 
         foreach ($pages as $key => $page) {
-            PageContent::updateOrCreate(['key' => $key], $page);
+            PageContent::firstOrCreate(['key' => $key], $page);
         }
     }
 }

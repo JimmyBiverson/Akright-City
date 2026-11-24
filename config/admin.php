@@ -12,6 +12,10 @@ use App\Models\Video;
 use App\Models\Village;
 
 return [
+    'email' => env('ADMIN_EMAIL', 'admin@akrightcity.com'),
+    'name' => env('ADMIN_NAME', 'ACRA Administrator'),
+    'password' => env('ADMIN_PASSWORD'),
+
     'resources' => [
         'pages' => [
             'label' => 'Page Content',
