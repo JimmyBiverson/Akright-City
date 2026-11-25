@@ -102,8 +102,8 @@ class SitePagesTest extends TestCase
 
         $this->get(route('home'))
             ->assertOk()
-            ->assertSee('rel="icon" type="image/x-icon"', false)
-            ->assertSee('favicon.ico', false)
+            ->assertSee('rel="icon" type="image/x-icon" sizes="any"', false)
+            ->assertSee('favicon.ico?v=', false)
             ->assertSee('property="og:image"', false)
             ->assertSee('acra-social-preview.jpg', false)
             ->assertSee('property="og:image:width" content="1024"', false)

@@ -7,8 +7,8 @@
     <meta name="description" content="@yield('description', 'Akright City Residents Association')">
     <title>@hasSection('title') @yield('title') | Akright City @else Akright City Residents Association @endif</title>
     <link rel="canonical" href="{{ url()->current() }}">
-    <link rel="icon" type="image/x-icon" href="{{ asset('favicon.ico') }}">
-    <link rel="shortcut icon" href="{{ asset('favicon.ico') }}">
+    <link rel="icon" type="image/x-icon" sizes="any" href="{{ $faviconUrl }}">
+    <link rel="shortcut icon" href="{{ $faviconUrl }}">
     <meta property="og:title" content="@yield('title', 'Akright City Residents Association')">
     <meta property="og:type" content="website">
     <meta property="og:url" content="{{ url()->current() }}">

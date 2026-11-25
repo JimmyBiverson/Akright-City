@@ -31,7 +31,13 @@ class AppServiceProvider extends ServiceProvider
                 return PageContent::where('key', 'footer')->first();
             });
 
-            $view->with('footerContent', $footerContent);
+            $faviconPath = public_path('favicon.ico');
+            $faviconVersion = is_file($faviconPath) ? filemtime($faviconPath) : 0;
+
+            $view->with([
+                'footerContent' => $footerContent,
+                'faviconUrl' => asset('favicon.ico').'?v='.$faviconVersion,
+            ]);
         });
     }
 }
